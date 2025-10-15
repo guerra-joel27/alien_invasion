@@ -24,5 +24,5 @@ class Ship:
         """draw the ship at its current location"""
         # we draw the image, at the rect position currently set
         # self.rect will change depending on certain events
-        # after starting at the initial midbottom we we set as the default position
+        # after starting at the initial midbottom we had set as the default position
         self.screen.blit(self.image, self.rect)
