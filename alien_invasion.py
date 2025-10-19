@@ -20,28 +20,51 @@ class AlienInvasion:
 
         pygame.display.set_caption("Alien Invasion")
 
-        # we create a ship variable and pass in the current instance of the game
+        # create a ship variable and pass in the current instance of the game
         self.ship = Ship(self)
 
     def run_game(self):
         """Start the main loop for the game"""
         while True:
-            # Watch for keyboard and mouse events
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    sys.exit()
 
-            # redraw the screen during each pass through the loop
-            self.screen.fill(self.settings.bg_color)
+            self._check_events()
+            self.ship.update()
+            self._update_screen()
 
-            # draw the ship to the screen
-            self.ship.blitme()
-
-            # Make the most recently drawn screen visible.
-            pygame.display.flip()
-
-            # set the frame rate to the common 60 FPS so that it works consistently on most computers
+            # set the frame rate to the common 60 FPS
             self.clock.tick(60)
+
+    def _check_events(self):
+        """respond to keypresses and mouse events."""
+
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                sys.exit()
+
+            elif event.type == pygame.KEYDOWN:
+
+                if event.key == pygame.K_RIGHT:
+                    # move the ship to the right
+                    self.ship.moving_right = True
+                elif event.key == pygame.K_LEFT:
+                    # move the ship to the left
+                    self.ship.moving_left = True
+
+            elif event.type == pygame.KEYUP:
+
+                if event.key == pygame.K_RIGHT:
+                    self.ship.moving_right = False
+                elif event.key == pygame.K_LEFT:
+                    self.ship.moving_left = False
+
+    def _update_screen(self):
+        """update images on the screen, and flip to the new screen."""
+
+        self.screen.fill(self.settings.bg_color)
+        self.ship.blitme()
+
+        pygame.display.flip()
 
 
 if __name__ == "__main__":
