@@ -15,9 +15,18 @@ class AlienInvasion:
         pygame.init()
         self.clock = pygame.time.Clock()  # we create a clock to track time
         self.settings = Settings()
-        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-        self.settings.screen_width = self.screen.get_rect().width
-        self.settings.screen_height = self.screen.get_rect().height
+
+        # three lines to make the game full screen if we decide to
+
+        # self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        # self.settings.screen_width = self.screen.get_rect().width
+        # self.settings.screen_height = self.screen.get_rect().height
+
+        # otherwise we will start the game with the parameters we have set in the settings
+
+        self.screen = pygame.display.set_mode(
+            (self.settings.screen_width, self.settings.screen_height)
+        )
 
         pygame.display.set_caption("Alien Invasion")
 
@@ -31,15 +40,9 @@ class AlienInvasion:
 
             self._check_events()
             self.ship.update()
-            self.bullets.update()
-
-            # get rid of the bullets that have dissapeared
-            for bullet in self.bullets.copy():
-                if bullet.rect.bottom <= 0:
-                    self.bullets.remove(bullet)
-            print(len(self.bullets))
-
+            self._update_bullets()
             self._update_screen()
+
             # set the frame rate to the common 60 FPS
             self.clock.tick(60)
 
@@ -77,8 +80,9 @@ class AlienInvasion:
 
     def _fire_bullet(self):
         """create a new bullet and add it to the bullets group"""
-        new_bullet = Bullet(self)
-        self.bullets.add(new_bullet)
+        if len(self.bullets) < self.settings.bullets_allowed:
+            new_bullet = Bullet(self)
+            self.bullets.add(new_bullet)
 
     def _update_screen(self):
         """update images on the screen, and flip to the new screen."""
@@ -88,7 +92,21 @@ class AlienInvasion:
             bullet.draw_bullet()
         self.ship.blitme()
 
+        # flip() is used to update the entire display after all updates
+        # so needs to be called last
         pygame.display.flip()
+
+    def _update_bullets(self):
+        """update position of bullets and get rid of old bullets as they leave the screen"""
+        # update bullet positions
+        # update method loops through list to update each
+        # due to how Groups work
+        self.bullets.update()
+
+        # get rid of bullets that have left the screen
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
 
 
 if __name__ == "__main__":
