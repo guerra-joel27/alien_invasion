@@ -5,6 +5,7 @@ import pygame
 
 from alien import Alien
 from bullet import Bullet
+from button import Button
 from game_stats import GameStats
 from settings import Settings
 from ship import Ship
@@ -19,8 +20,8 @@ class AlienInvasion:
         self.clock = pygame.time.Clock()  # we create a clock to track time
         self.settings = Settings()
 
-        # start alien invasion in an active state
-        self.game_active = True
+        # start alien invasion in an inactive state
+        self.game_active = False
 
         # three lines to make the game full screen if we decide to
 
@@ -33,6 +34,9 @@ class AlienInvasion:
         self.screen = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height)
         )
+
+        # make the play button, passing the AI instance + text
+        self.play_button = Button(self, "Play")
 
         pygame.display.set_caption("Alien Invasion")
 
@@ -77,6 +81,15 @@ class AlienInvasion:
             elif event.type == pygame.KEYUP:
                 self._check_keyup_events(event)
 
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                self._check_play_button(mouse_pos)
+
+    def _check_play_button(self, mouse_pos):
+        """start the game when the player clicks play"""
+        if self.play_button.rect.collidepoint(mouse_pos):
+            self.game_active = True
+
     def _check_keydown_events(self, event):
         """respond to keypresses"""
         if event.key == pygame.K_RIGHT:
@@ -109,6 +122,10 @@ class AlienInvasion:
             bullet.draw_bullet()
         self.ship.blitme()
         self.aliens.draw(self.screen)
+
+        # draw the play button if the game is inactive
+        if not self.game_active:
+            self.play_button.draw_button()
 
         # flip() is used to update the entire display after all updates
         # so needs to be called last
