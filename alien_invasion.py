@@ -7,6 +7,7 @@ from alien import Alien
 from bullet import Bullet
 from button import Button
 from game_stats import GameStats
+from scoreboard import Scoreboard
 from settings import Settings
 from ship import Ship
 
@@ -40,8 +41,9 @@ class AlienInvasion:
 
         pygame.display.set_caption("Alien Invasion")
 
-        # create an instance to store game statistics
+        # create an instance to store game statistics and a scoreboard
         self.stats = GameStats(self)
+        self.sb = Scoreboard(self)
 
         # create a ship variable and pass in the current instance of the game
         self.ship = Ship(self)
@@ -87,7 +89,11 @@ class AlienInvasion:
 
     def _check_play_button(self, mouse_pos):
         """start the game when the player clicks play"""
-        if self.play_button.rect.collidepoint(mouse_pos):
+        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+        if button_clicked and not self.game_active:
+            # reset the game settings
+            self.settings.initialize_dynamic_settings()
+
             self.stats.reset_stats()
             self.game_active = True
 
@@ -98,6 +104,9 @@ class AlienInvasion:
             # create a new fleet and center the ship
             self._create_fleet()
             self.ship.center_ship()
+
+            # hide the mouse cursor
+            pygame.mouse.set_visible(False)
 
     def _check_keydown_events(self, event):
         """respond to keypresses"""
@@ -131,6 +140,9 @@ class AlienInvasion:
             bullet.draw_bullet()
         self.ship.blitme()
         self.aliens.draw(self.screen)
+
+        # draw the score information
+        self.sb.show_score()
 
         # draw the play button if the game is inactive
         if not self.game_active:
@@ -166,6 +178,7 @@ class AlienInvasion:
             # destroy existing bullets and create new fleet
             self.bullets.empty()
             self._create_fleet()
+            self.settings.increase_speed()
 
     def _update_aliens(self):
         """check if the fleet is at an edge, then update positions"""
