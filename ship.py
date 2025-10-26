@@ -16,6 +16,7 @@ class Ship(Sprite):
 
         # load the ship image and get its rect
         self.image = pygame.image.load("images/SpaceShipNormal.bmp")
+        self.image = pygame.transform.scale(self.image, (40, 32))
         # we call the get_rect method to get the numbers for the image
         self.rect = self.image.get_rect()
 
